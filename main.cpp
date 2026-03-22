@@ -18,11 +18,11 @@ int main()
   
     Resturacja r(5000, 20); 
     cout << "\nTwoja ekipa startowa gotowa do pracy:" << endl;
-    cout << "-> Robert (Kucharz):  Pensja 30/h, Wytrzymalosc 2h, Zabrudzenie-5" << endl;
+    cout << "-> Robert (Kucharz):  Pensja 22/h, Wytrzymalosc 2h, Zabrudzenie-5" << endl;
     cout << "-> Alicja (Kelnerka): Pensja 20/h, Wytrzymalosc 3h, Zabrudzenie -2" << endl;
     cout << "--------------------------------------------" << endl;
  
-    r.zatrudnij(make_unique<Kucharz>("Robert (Start)", 30.0, 2, -5));
+    r.zatrudnij(make_unique<Kucharz>("Robert (Start)", 22.0, 2, -5));
     r.zatrudnij(make_unique<Kelner>("Alicja (Start)", 20.0, 3, -2));
 
     

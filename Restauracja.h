@@ -34,9 +34,9 @@ public:
         poziom_prestizu = 1;
         liczba_dni = dni_gry;
         budzet = pocztakowy_budzet;
-        menu.push_back({"Zestaw 1", 10.0, 25.0});
-        menu.push_back({"Zestaw 2", 15.0, 40.0});
-        menu.push_back({"Zestaw 3", 20.0, 75.0});
+        menu.push_back({"Zestaw 1", 10.0, 45.0});
+        menu.push_back({"Zestaw 2", 15.0, 65.0});
+        menu.push_back({"Zestaw 3", 20.0, 95.0});
     };
 
     void zatrudnij(unique_ptr<Pracownik> p)
@@ -276,10 +276,13 @@ public:
 
             if (wybor == 1)
             {
+               
+            
                 cout << "\n--- DOSTEPNI KUCHARZE ---" << endl;
-                cout << "1. Maciek (Tani) [Koszt: 400 zl] Pensja 15/h, Meczy sie po 2h, Brudzi -7" << endl;
-                cout << "2. Ania   (Srednia) [Koszt: 800 zl] Pensja 40/h, Meczy sie po 4h, Brudzi -5" << endl;
-                cout << "3. Janek  (Pro) [Koszt: 1500 zl] Pensja 150/h, Meczy sie po 7h, Brudzi -2" << endl;
+                // Poprawione opisy, by gracz widział realną stawkę po awansach:
+                cout << "1. Maciek (Tani) [Koszt: 400 zl] Pensja 15/h, Meczy sie po 2h, Brudzi -5" << endl;
+                cout << "2. Ania   (Srednia) [Koszt: 800 zl] Pensja 25/h, Meczy sie po 4h, Brudzi -3" << endl;
+                cout << "3. Janek  (Pro) [Koszt: 1500 zl] Pensja 35/h, Meczy sie po 7h, Brudzi -1" << endl;
                 cout << "Wybierz kandydata: ";
                 int pod_wybor;
                 cin >> pod_wybor;
@@ -287,46 +290,64 @@ public:
                 if (pod_wybor == 1)
                 {
                     budzet -= 400;
-                    zatrudnij(make_unique<Kucharz>("Maciek", 15.0, 2, -7));
-                    cout << "Zatrudniono Macka!\n";
+                    zatrudnij(make_unique<Kucharz>("Maciek", 15.0, 2, -5)); // Lvl 1, pensja 15 zl
+                    cout << "Zatrudniono Macka (Lvl 1)!\n";
                 }
                 else if (pod_wybor == 2)
                 {
                     budzet -= 800;
-                    zatrudnij(make_unique<Kucharz>("Ania", 40.0, 4, -5));
-                    cout << "Zatrudniono Anie!\n";
+                    // Startuje z 15 zl, ale jeden awans podbije to do 20-25 zl (zaleznie od Twojej funkcji awansuj)
+                    // Bezpieczniej dac mu bazowo 20.0
+                    auto ania = make_unique<Kucharz>("Ania", 20.0, 4, -3); 
+                    ania->awansuj(); // Wskakuje na Lvl 2 (+5 zl = 25 zl/h)
+                    zatrudnij(std::move(ania));
+                    cout << "Zatrudniono Anie (Lvl 2)!\n";
                 }
                 else if (pod_wybor == 3)
                 {
                     budzet -= 1500;
-                    zatrudnij(make_unique<Kucharz>("Janek", 150.0, 7, -2));
-                    cout << "Zatrudniono Janka!\n";
+                    // Ustawiamy niską bazę (25 zl). Dwa awanse dodadzą 10 zl. 
+                    auto janek = make_unique<Kucharz>("Janek", 25.0, 7, -1); 
+                    janek->awansuj(); // Lvl 2
+                    janek->awansuj(); // Lvl3 (Finalna pensja: 35 zl/h) 
+                    zatrudnij(std::move(janek));
+                    cout << "Zatrudniono Janka (Lvl 3)!\n";
                 }
             }
+         
             else if (wybor == 2)
             {
                 cout << "\n--- DOSTEPNI KELNERZY ---" << endl;
-                cout << "1. Kasia (Studentka) [Koszt: 250 zl] Pensja 30/h, Meczy sie po 3h, Brudzi -4" << endl;
-                cout << "2. Marek (Zawodowiec) [Koszt: 850 zl] Pensja 25/h, Meczy sie po 6h, Brudzi -2" << endl;
-                cout << "3. Artur (Mistrz Sali) [Koszt: 1300 zl] Pensja 100/h, Meczy sie po 8h, Brudzi 0" << endl;
+                cout << "1. Kasia (Studentka) [Koszt: 250 zl] Pensja 18/h, Meczy sie po 3h, Brudzi -4" << endl;
+                cout << "2. Marek (Zawodowiec) [Koszt: 850 zl] Pensja 20/h, Meczy sie po 6h, Brudzi -2" << endl;
+                cout << "3. Artur (Mistrz Sali) [Koszt: 1300 zl] Pensja 25/h, Meczy sie po 8h, Brudzi 0" << endl;
                 cout << "Wybierz kandydata: ";
                 int pod_wybor;
                 cin >> pod_wybor;
 
+                // W sekcji wyboru kelnerow:
                 if (pod_wybor == 1)
                 {
                     budzet -= 250;
-                    zatrudnij(make_unique<Kelner>("Kasia", 30.0, 3, -4));
+                    zatrudnij(make_unique<Kelner>("Kasia", 18.0, 3, -2)); // Bazowo 18 zl
+                    cout << "Zatrudniono Kasie (Lvl 1)!\n";
                 }
                 else if (pod_wybor == 2)
                 {
                     budzet -= 850;
-                    zatrudnij(make_unique<Kelner>("Marek", 45.0, 6, -2));
+                    auto marek = make_unique<Kelner>("Marek", 20.0, 6, -1); // Bazowo 20 zl
+                    marek->awansuj(); // Stawka rosnie do 25 zl
+                    zatrudnij(std::move(marek));
+                    cout << "Zatrudniono Marka (Lvl 2)!\n";
                 }
                 else if (pod_wybor == 3)
                 {
                     budzet -= 1300;
-                    zatrudnij(make_unique<Kelner>("Artur", 100.0, 8, 0));
+                    auto artur = make_unique<Kelner>("Artur", 25.0, 8, 0); // Bazowo 25 zl
+                    artur->awansuj(); 
+                    artur->awansuj(); // Stawka rosnie do 35 zl
+                    zatrudnij(std::move(artur));
+                    cout << "Zatrudniono Artura (Lvl 3)!\n";
                 }
             }
             else if (wybor == 3)
@@ -357,7 +378,7 @@ public:
                 }
                 else if (p == 4)
                 {
-                    sprzatacz = make_unique<Osoba_Sprzatajaca>("Firma BLYSK 2.0", 800.0, 10, 100);
+                    sprzatacz = make_unique<Osoba_Sprzatajaca>("Firma BLYSK 2.0", 300.0, 10, 100);
                 }
 
                 if (sprzatacz != nullptr)
@@ -670,6 +691,28 @@ public:
             cout << "!!! [ZDARZENIE] Inspektor BHP wlepia mandat za brak apteczki! [-100 zl] !!!" << endl;
             budzet -= 100;
             dzienny_bilans_losowy -= 100;
+        }
+        else if (los >= 60 && los <= 62) // Szansa 3%
+        {
+            cout << "!!! [ZDARZENIE] Darmowa dostawa srodkow czystosci w ramach promocji! [+30 do czystosci] !!!" << endl;
+            poziom_czystosci += 30;
+        }
+        else if (los >= 63 && los <= 65) // Szansa 3%
+        {
+            cout << "!!! [ZDARZENIE] Zachwycony turysta zostawil gruby napiwek! [+150 zl do budzetu] !!!" << endl;
+            budzet += 150;
+            dzienny_bilans_losowy += 150;
+        }
+        else if (los >= 66 && los <= 68) // Szansa 3%
+        {
+            cout << "!!! [ZDARZENIE] Swietny wywiad z wlascicielem w lokalnej gazecie! [+35 do prestizu] !!!" << endl;
+            prestiz += 35;
+        }
+        else if (los >= 69 && los <= 71) // Szansa 3%
+        {
+            cout << "!!! [ZDARZENIE] Wirusowy TikTok o Twoim jedzeniu! Odwiedzil Cie tlum! [+200 zl do budzetu] !!!" << endl;
+            budzet += 200;
+            dzienny_bilans_losowy += 200;
         }
         else
         {
