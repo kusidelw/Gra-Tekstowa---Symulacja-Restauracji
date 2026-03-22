@@ -44,43 +44,56 @@ public:
         pracownicy.push_back(std::move(p));
     }
 
-   void zmien_prestiz(int zmiana)
-    { 
+    void zmien_prestiz(int zmiana)
+    {
         if (zmiana > 0)
         {
-            prestiz += zmiana;
-            cout << "!!! [PRESTIZ] Prestiż rośnie o " << zmiana << " punktów! (Aktualny: " << prestiz << ") !!!" << endl;
-            return;
-        }
-        else{
-        if (prestiz < zmiana && poziom_prestizu == 1)
-        {
-            cout << "Prestiż jest juz na dnie... Klienci omijaja lokal!" << endl;
-            prestiz = 0;
-        }
-        else if (prestiz < zmiana)
-        {
-            prestiz = 50 + prestiz - zmiana; // Przy obnizeniu prestizu o 20, jesli mamy tylko 10 prestizu, to spadamy do 40 i tracimy poziom prestizu
-            poziom_prestizu--;
-            cout << "!!! [UWAGA] Poziom prestizu spada na " << poziom_prestizu << " !!!" << endl;
+            while (prestiz >= 50)
+            {
+                if (poziom_prestizu < 5)
+                {
+                    poziom_prestizu++;
+                    prestiz -= 50;
+                    cout << "!!! RESTAURACJA AWANSOWALA NA POZIOM " << poziom_prestizu << " !!!" << endl;
+                }
+                else
+                {
+                    prestiz = 50; // Maksymalny prestiz to Lvl 5 i 50/50 punktow
+                    break;
+                }
+            }
         }
         else
         {
-            prestiz -= zmiana;
-        }
+            if (prestiz < zmiana && poziom_prestizu == 1)
+            {
+                cout << "Prestiż jest juz na dnie... Klienci omijaja lokal!" << endl;
+                prestiz = 0;
+            }
+            else if (prestiz < zmiana)
+            {
+                prestiz = 50 + prestiz - zmiana; // Przy obnizeniu prestizu o 20, jesli mamy tylko 10 prestizu, to spadamy do 40 i tracimy poziom prestizu
+                poziom_prestizu--;
+                cout << "!!! [UWAGA] Poziom prestizu spada na " << poziom_prestizu << " !!!" << endl;
+            }
+            else
+            {
+                prestiz -= zmiana;
+            }
         }
     }
 
     void wyslij_na_szkolenie(int numer_pracownika)
     {
         double koszt_szkolenia = 300.0;
-        
+
         if (numer_pracownika >= 0 && numer_pracownika < pracownicy.size())
         {
-            
-            if (pracownicy[numer_pracownika]->get_poziom() >= 3) {
+
+            if (pracownicy[numer_pracownika]->get_poziom() >= 3)
+            {
                 cout << "Ten pracownik osiagnal juz maksymalny 3. poziom doswiadczenia!" << endl;
-                return; 
+                return;
             }
 
             if (budzet >= koszt_szkolenia)
@@ -129,9 +142,9 @@ public:
         int ugotowane_produkty = 0;
         int sprzedane_produkty = 0;
         int czystosc_na_starcie = poziom_czystosci;
-        int los2 = rand() % 100; 
+        int los2 = rand() % 100;
 
-        dzienny_bilans_losowy = 0; 
+        dzienny_bilans_losowy = 0;
 
         for (int i = 0; i < 8; i++)
         {
@@ -145,20 +158,18 @@ public:
                     if (pracownik->pracuj())
                     {
                         aktywni_pracownicy++;
-                        
 
-                     
                         Kucharz *kucharz = dynamic_cast<Kucharz *>(pracownik.get());
                         if (kucharz)
                         {
-                            
+
                             int ilosc_dan = (rand() % kucharz->get_poziom()) + 1;
 
-                            
                             for (int d = 0; d < ilosc_dan; d++)
                             {
                                 int max_danie = kucharz->get_poziom() - 1;
-                                if (max_danie >= menu.size()) max_danie = menu.size() - 1;
+                                if (max_danie >= menu.size())
+                                    max_danie = menu.size() - 1;
 
                                 int nr_dania = rand() % (max_danie + 1);
 
@@ -170,14 +181,13 @@ public:
                             }
                         }
 
-                        
                         Kelner *kelner = dynamic_cast<Kelner *>(pracownik.get());
                         if (kelner)
                         {
                             int podane_dania = 0;
-                            
-                            int max_talerzy = kelner->get_poziom(); 
-                            
+
+                            int max_talerzy = kelner->get_poziom();
+
                             for (int t = 0; t < max_talerzy; t++)
                             {
                                 if (!gotowe_zestawy.empty())
@@ -191,24 +201,28 @@ public:
                                 }
                             }
 
-                            if (podane_dania > 0) cout << "[$ Sprzedano " << podane_dania << "!] ";
-                            else cout << "[!] ";
+                            if (podane_dania > 0)
+                                cout << "[$ Sprzedano " << podane_dania << "!] ";
+                            else
+                                cout << "[!] ";
                         }
                     }
-                    else{
-                    poziom_czystosci += pracownik->wplyw_na_czystosc();
-                }
+                    else
+                    {
+                        poziom_czystosci += pracownik->wplyw_na_czystosc();
+                    }
                 }
             }
             if (aktywni_pracownicy == 0)
                 zmien_prestiz(-5);
             zdarzenie_losowe();
-            if (poziom_czystosci < 0) poziom_czystosci = 0;
-            if (poziom_czystosci > 100) poziom_czystosci = 100;
+            if (poziom_czystosci < 0)
+                poziom_czystosci = 0;
+            if (poziom_czystosci > 100)
+                poziom_czystosci = 100;
         }
 
         cout << "\n\n--- ZAMKNIECIE LOKALU (ROZLICZENIE WYPLAT) ---" << endl;
-        
 
         double suma_wyplat = 0;
         for (auto &pracownik : pracownicy)
@@ -219,18 +233,20 @@ public:
             pracownik->nastepny_dzien();
         }
 
-       
         statystyki_dnia(ugotowane_produkty, sprzedane_produkty, zarobek_z_dan, koszt_skladnikow_suma, suma_wyplat, czystosc_na_starcie);
 
-      
         while (prestiz >= 50)
         {
-            if (poziom_prestizu < 5) {
+            if (poziom_prestizu < 5)
+            {
                 poziom_prestizu++;
                 prestiz -= 50;
-                cout << "!!! RESTAURACJA AWANSOWALA NA POZIOM " << poziom_prestizu << " !!!\n" << endl;
-            } else {
-                prestiz = 50; 
+                cout << "!!! RESTAURACJA AWANSOWALA NA POZIOM " << poziom_prestizu << " !!!\n"
+                     << endl;
+            }
+            else
+            {
+                prestiz = 50;
                 break;
             }
         }
@@ -321,26 +337,44 @@ public:
                 cout << "3. Firma BLYSK (+80 czystosci | Koszt: 200 zl/dzien)" << endl;
                 cout << "4. Firma BLYSK 2.0 (+100 czystosci | Koszt: 800 zl/dzien)" << endl;
                 cout << "Wybierz opcje: ";
-                int p; cin >> p;
-                
-                unique_ptr<Pracownik> sprzatacz = nullptr;
-                
-                // TUTAJ JEST ZMIANA! Zamiast 'zatrudnij', przypisujemy do zmiennej 'sprzatacz'
-                if (p==1) { sprzatacz = make_unique<Osoba_Sprzatajaca>("Mietek", 90.0, 10, 15); } 
-                else if (p==2) { sprzatacz = make_unique<Osoba_Sprzatajaca>("Jadzia", 140.0, 10, 40); } 
-                else if (p==3) { sprzatacz = make_unique<Osoba_Sprzatajaca>("Firma BLYSK", 200.0, 10, 80); }
-                else if (p==4) { sprzatacz = make_unique<Osoba_Sprzatajaca>("Firma BLYSK 2.0", 800.0, 10, 100); }
+                int p;
+                cin >> p;
 
-                if (sprzatacz != nullptr) {
-                    double koszt = sprzatacz->pobierz_wynagrodzenie(); 
-                    if (budzet >= koszt) {
+                unique_ptr<Pracownik> sprzatacz = nullptr;
+
+                // TUTAJ JEST ZMIANA! Zamiast 'zatrudnij', przypisujemy do zmiennej 'sprzatacz'
+                if (p == 1)
+                {
+                    sprzatacz = make_unique<Osoba_Sprzatajaca>("Mietek", 90.0, 10, 15);
+                }
+                else if (p == 2)
+                {
+                    sprzatacz = make_unique<Osoba_Sprzatajaca>("Jadzia", 140.0, 10, 40);
+                }
+                else if (p == 3)
+                {
+                    sprzatacz = make_unique<Osoba_Sprzatajaca>("Firma BLYSK", 200.0, 10, 80);
+                }
+                else if (p == 4)
+                {
+                    sprzatacz = make_unique<Osoba_Sprzatajaca>("Firma BLYSK 2.0", 800.0, 10, 100);
+                }
+
+                if (sprzatacz != nullptr)
+                {
+                    double koszt = sprzatacz->pobierz_wynagrodzenie();
+                    if (budzet >= koszt)
+                    {
                         budzet -= koszt;
-                        sprzatacz->pracuj(); 
+                        sprzatacz->pracuj();
                         poziom_czystosci += sprzatacz->wplyw_na_czystosc();
-                        
-                        if (poziom_czystosci > 100) poziom_czystosci = 100; 
+
+                        if (poziom_czystosci > 100)
+                            poziom_czystosci = 100;
                         cout << " -> Aktualna czystosc wynosi: " << poziom_czystosci << "%" << endl;
-                    } else {
+                    }
+                    else
+                    {
                         cout << " -> Brak srodkow na te usluge!" << endl;
                     }
                 }
@@ -383,18 +417,20 @@ public:
         cout << "\nKoniec symulacji. Finalny budzet: " << budzet << endl;
     }
 
-   void wyswietl_pracownikow()
+    void wyswietl_pracownikow()
     {
         cout << "\n--- LISTA ZALOGI ---" << endl;
-        if (pracownicy.empty()) cout << "[Brak zatrudnionych pracownikow]" << endl;
-        
+        if (pracownicy.empty())
+            cout << "[Brak zatrudnionych pracownikow]" << endl;
+
         for (int i = 0; i < pracownicy.size(); i++)
         {
             string rola = "Pracownik";
-            if (dynamic_cast<Kucharz *>(pracownicy[i].get())) rola = "Kucharz";
-            else if (dynamic_cast<Kelner *>(pracownicy[i].get())) rola = "Kelner";
-            
-            
+            if (dynamic_cast<Kucharz *>(pracownicy[i].get()))
+                rola = "Kucharz";
+            else if (dynamic_cast<Kelner *>(pracownicy[i].get()))
+                rola = "Kelner";
+
             cout << i << ". [" << rola << "] - Lvl " << pracownicy[i]->get_poziom() << endl;
         }
     }
@@ -429,141 +465,215 @@ public:
         pracownicy.erase(pracownicy.begin() + indeks);
     }
 
-   void zdarzenie_losowe()
+    void zdarzenie_losowe()
     {
         int los = rand() % 100; // Losujemy od 0 do 99
 
-        if (los >= 0 && los <= 1) {
+        if (los >= 0 && los <= 1)
+        {
             cout << "!!! [ZDARZENIE] Kontrola SANEPIDU !!!" << endl;
-            if (poziom_czystosci < 50) {
+            if (poziom_czystosci < 50)
+            {
                 cout << " -> Syf w kuchni! Mandat 300 zl i tracisz prestiz [-20]." << endl;
-                budzet -= 300; dzienny_bilans_losowy -= 300; zmien_prestiz(-20);
-            } else {
-                cout << " -> Czysto! Sanepid gratuluje. Prestiz w gore [+10]!" << endl; prestiz += 10;
+                budzet -= 300;
+                dzienny_bilans_losowy -= 300;
+                zmien_prestiz(-20);
+            }
+            else
+            {
+                cout << " -> Czysto! Sanepid gratuluje. Prestiz w gore [+10]!" << endl;
+                prestiz += 10;
             }
         }
-        else if (los >= 2 && los <= 3) {
+        else if (los >= 2 && los <= 3)
+        {
             cout << "!!! [ZDARZENIE] Student rozlal zupe! [-30 czystosc] !!!" << endl;
             poziom_czystosci -= 30;
         }
-        else if (los >= 4 && los <= 5) {
+        else if (los >= 4 && los <= 5)
+        {
             cout << "!!! [ZDARZENIE] Bogaty biznesmen daje napiwek! [+250 zl do budzetu] !!!" << endl;
-            budzet += 250; dzienny_bilans_losowy += 250;
+            budzet += 250;
+            dzienny_bilans_losowy += 250;
         }
-        else if (los >= 6 && los <= 7) {
+        else if (los >= 6 && los <= 7)
+        {
             cout << "!!! [ZDARZENIE] Stluczone talerze! [-50 zl do budzetu] !!!" << endl;
-            budzet -= 50; dzienny_bilans_losowy -= 50;
+            budzet -= 50;
+            dzienny_bilans_losowy -= 50;
         }
-        else if (los >= 8 && los <= 9) {
+        else if (los >= 8 && los <= 9)
+        {
             cout << "!!! [ZDARZENIE] Tajny Krytyk Kulinarny! !!!" << endl;
-            if (poziom_czystosci > 80 && !gotowe_zestawy.empty()) {
-                cout << " -> Recenzja 5 gwiazdek! [+40 do prestizu]" << endl; prestiz += 40;
-            } else {
-                cout << " -> Fatalna recenzja. [-30 do prestizu]" << endl; zmien_prestiz(-30);
+            if (poziom_czystosci > 80 && !gotowe_zestawy.empty())
+            {
+                cout << " -> Recenzja 5 gwiazdek! [+40 do prestizu]" << endl;
+                prestiz += 40;
+            }
+            else
+            {
+                cout << " -> Fatalna recenzja. [-30 do prestizu]" << endl;
+                zmien_prestiz(-30);
             }
         }
-        else if (los >= 10 && los <= 11) {
+        else if (los >= 10 && los <= 11)
+        {
             cout << "!!! [ZDARZENIE] Awaria pradu! Tracisz zapasy. [-150 zl do budzetu] !!!" << endl;
-            budzet -= 150; dzienny_bilans_losowy -= 150;
+            budzet -= 150;
+            dzienny_bilans_losowy -= 150;
         }
-        else if (los >= 12 && los <= 13) {
+        else if (los >= 12 && los <= 13)
+        {
             cout << "!!! [ZDARZENIE] Znany influencer wrzucil zdjecie! [+25 do prestizu] !!!" << endl;
             prestiz += 25;
         }
-        else if (los >= 14 && los <= 15) {
+        else if (los >= 14 && los <= 15)
+        {
             cout << "!!! [ZDARZENIE] Hurtownia dala rabat! [+100 zl do budzetu] !!!" << endl;
-            budzet += 100; dzienny_bilans_losowy += 100;
+            budzet += 100;
+            dzienny_bilans_losowy += 100;
         }
-        else if (los >= 16 && los <= 17) {
+        else if (los >= 16 && los <= 17)
+        {
             cout << "!!! [ZDARZENIE] Zlodziej ukradl pieniadze! [-200 zl do budzetu] !!!" << endl;
-            budzet -= 200; dzienny_bilans_losowy -= 200;
+            budzet -= 200;
+            dzienny_bilans_losowy -= 200;
         }
-        else if (los >= 18 && los <= 19) {
+        else if (los >= 18 && los <= 19)
+        {
             cout << "!!! [ZDARZENIE] Festiwal Jedzenia - utarg w gore! [+400 zl do budzetu] !!!" << endl;
-            budzet += 400; dzienny_bilans_losowy += 400;
+            budzet += 400;
+            dzienny_bilans_losowy += 400;
         }
-        else if (los >= 20 && los <= 21) {
+        else if (los >= 20 && los <= 21)
+        {
             cout << "!!! [ZDARZENIE] Pekla rura w lazience! [-100 zl, -20 czystosc] !!!" << endl;
-            budzet -= 100; dzienny_bilans_losowy -= 100; poziom_czystosci -= 20;
+            budzet -= 100;
+            dzienny_bilans_losowy -= 100;
+            poziom_czystosci -= 20;
         }
-        else if (los >= 22 && los <= 23) {
+        else if (los >= 22 && los <= 23)
+        {
             cout << "!!! [ZDARZENIE] Autobus turystow! [+300 zl, -15 czystosc] !!!" << endl;
-            budzet += 300; dzienny_bilans_losowy += 300; poziom_czystosci -= 15;
+            budzet += 300;
+            dzienny_bilans_losowy += 300;
+            poziom_czystosci -= 15;
         }
-        else if (los >= 24 && los <= 25) {
+        else if (los >= 24 && los <= 25)
+        {
             cout << "!!! [ZDARZENIE] Kelner oddal zgubiony portfel! [+50 zl, +10 prestizu] !!!" << endl;
-            budzet += 50; dzienny_bilans_losowy += 50; prestiz += 10;
+            budzet += 50;
+            dzienny_bilans_losowy += 50;
+            prestiz += 10;
         }
-        else if (los >= 26 && los <= 27) {
+        else if (los >= 26 && los <= 27)
+        {
             cout << "!!! [ZDARZENIE] Zapalil sie kosz na smieci! [-60 zl gasnica, -10 prestizu] !!!" << endl;
-            budzet -= 60; dzienny_bilans_losowy -= 60; zmien_prestiz(-10);
+            budzet -= 60;
+            dzienny_bilans_losowy -= 60;
+            zmien_prestiz(-10);
         }
-        else if (los >= 28 && los <= 29) {
+        else if (los >= 28 && los <= 29)
+        {
             cout << "!!! [ZDARZENIE] Nagle zamowienie cateringowe! [+350 zl do budzetu] !!!" << endl;
-            budzet += 350; dzienny_bilans_losowy += 350;
+            budzet += 350;
+            dzienny_bilans_losowy += 350;
         }
-        else if (los >= 30 && los <= 31) {
+        else if (los >= 30 && los <= 31)
+        {
             cout << "!!! [ZDARZENIE] Darmowa reklama w lokalnym radiu! [+20 do prestizu] !!!" << endl;
             prestiz += 20;
         }
-        else if (los >= 32 && los <= 33) {
+        else if (los >= 32 && los <= 33)
+        {
             cout << "!!! [ZDARZENIE] Dzieci pomalowaly sciane! [-50 zl farba, -20 czystosc] !!!" << endl;
-            budzet -= 50; dzienny_bilans_losowy -= 50; poziom_czystosci -= 20;
+            budzet -= 50;
+            dzienny_bilans_losowy -= 50;
+            poziom_czystosci -= 20;
         }
-        else if (los >= 34 && los <= 35) {
+        else if (los >= 34 && los <= 35)
+        {
             cout << "!!! [ZDARZENIE] Dostawca warzyw zgubil droge! [-80 zl do budzetu] !!!" << endl;
-            budzet -= 80; dzienny_bilans_losowy -= 80;
+            budzet -= 80;
+            dzienny_bilans_losowy -= 80;
         }
-        else if (los >= 36 && los <= 37) {
+        else if (los >= 36 && los <= 37)
+        {
             cout << "!!! [ZDARZENIE] Niespodziewana premia ze stowarzyszenia! [+150 zl do budzetu] !!!" << endl;
-            budzet += 150; dzienny_bilans_losowy += 150;
+            budzet += 150;
+            dzienny_bilans_losowy += 150;
         }
-        else if (los >= 38 && los <= 39) {
+        else if (los >= 38 && los <= 39)
+        {
             cout << "!!! [ZDARZENIE] Kontrola Urzedu Skarbowego. Drobna kara! [-150 zl do budzetu] !!!" << endl;
-            budzet -= 150; dzienny_bilans_losowy -= 150;
+            budzet -= 150;
+            dzienny_bilans_losowy -= 150;
         }
-        else if (los >= 40 && los <= 41) {
+        else if (los >= 40 && los <= 41)
+        {
             cout << "!!! [ZDARZENIE] Przeterminowane produkty zepsuly sie! [-100 zl, -15 czystosc] !!!" << endl;
-            budzet -= 100; dzienny_bilans_losowy -= 100; poziom_czystosci -= 15;
+            budzet -= 100;
+            dzienny_bilans_losowy -= 100;
+            poziom_czystosci -= 15;
         }
-        else if (los >= 42 && los <= 43) {
+        else if (los >= 42 && los <= 43)
+        {
             cout << "!!! [ZDARZENIE] Swieto Miasta - ogromny ruch! [+250 zl, -15 czystosc] !!!" << endl;
-            budzet += 250; dzienny_bilans_losowy += 250; poziom_czystosci -= 15;
+            budzet += 250;
+            dzienny_bilans_losowy += 250;
+            poziom_czystosci -= 15;
         }
-        else if (los >= 44 && los <= 45) {
+        else if (los >= 44 && los <= 45)
+        {
             cout << "!!! [ZDARZENIE] Awantura klientow na sali! [-20 prestiz, -20 czystosc] !!!" << endl;
-            zmien_prestiz(-20); poziom_czystosci -= 20;
+            zmien_prestiz(-20);
+            poziom_czystosci -= 20;
         }
-        else if (los >= 46 && los <= 47) {
+        else if (los >= 46 && los <= 47)
+        {
             cout << "!!! [ZDARZENIE] Wizyta lokalnego Burmistrza! [+30 prestiz] !!!" << endl;
             prestiz += 30;
         }
-        else if (los >= 48 && los <= 49) {
+        else if (los >= 48 && los <= 49)
+        {
             cout << "!!! [ZDARZENIE] Przypalona nowa patelnia! [-70 zl za sprzet] !!!" << endl;
-            budzet -= 70; dzienny_bilans_losowy -= 70;
+            budzet -= 70;
+            dzienny_bilans_losowy -= 70;
         }
-        else if (los >= 50 && los <= 51) {
+        else if (los >= 50 && los <= 51)
+        {
             cout << "!!! [ZDARZENIE] Awaria terminala - klienci odeszli! [-100 zl do budzetu] !!!" << endl;
-            budzet -= 100; dzienny_bilans_losowy -= 100;
+            budzet -= 100;
+            dzienny_bilans_losowy -= 100;
         }
-        else if (los >= 52 && los <= 53) {
+        else if (los >= 52 && los <= 53)
+        {
             cout << "!!! [ZDARZENIE] Zepsuta klimatyzacja (goraco!) [-150 zl naprawa, -10 prestiz] !!!" << endl;
-            budzet -= 150; dzienny_bilans_losowy -= 150; zmien_prestiz(-10);
+            budzet -= 150;
+            dzienny_bilans_losowy -= 150;
+            zmien_prestiz(-10);
         }
-        else if (los >= 54 && los <= 55) {
+        else if (los >= 54 && los <= 55)
+        {
             cout << "!!! [ZDARZENIE] Wspaniala pogoda - ogródek pelen ludzi! [+180 zl do budzetu] !!!" << endl;
-            budzet += 180; dzienny_bilans_losowy += 180;
+            budzet += 180;
+            dzienny_bilans_losowy += 180;
         }
-        else if (los >= 56 && los <= 57) {
+        else if (los >= 56 && los <= 57)
+        {
             cout << "!!! [ZDARZENIE] Pomylka hurtowni - darmowe skrzynki jablek! [+80 zl] !!!" << endl;
-            budzet += 80; dzienny_bilans_losowy += 80;
+            budzet += 80;
+            dzienny_bilans_losowy += 80;
         }
-        else if (los >= 58 && los <= 59) {
+        else if (los >= 58 && los <= 59)
+        {
             cout << "!!! [ZDARZENIE] Inspektor BHP wlepia mandat za brak apteczki! [-100 zl] !!!" << endl;
-            budzet -= 100; dzienny_bilans_losowy -= 100;
+            budzet -= 100;
+            dzienny_bilans_losowy -= 100;
         }
-        else {
-            
+        else
+        {
+
             cout << "Nic ciekawego sie nie wydarzylo." << endl;
         }
     }
