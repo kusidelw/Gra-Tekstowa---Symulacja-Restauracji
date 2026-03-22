@@ -44,22 +44,30 @@ public:
         pracownicy.push_back(std::move(p));
     }
 
-   void obniz_prestiz(int obnizenie)
-    {
-        if (prestiz < obnizenie && poziom_prestizu == 1)
+   void zmien_prestiz(int zmiana)
+    { 
+        if (zmiana > 0)
+        {
+            prestiz += zmiana;
+            cout << "!!! [PRESTIZ] Prestiż rośnie o " << zmiana << " punktów! (Aktualny: " << prestiz << ") !!!" << endl;
+            return;
+        }
+        else{
+        if (prestiz < zmiana && poziom_prestizu == 1)
         {
             cout << "Prestiż jest juz na dnie... Klienci omijaja lokal!" << endl;
             prestiz = 0;
         }
-        else if (prestiz < obnizenie)
+        else if (prestiz < zmiana)
         {
-            prestiz = 50 + prestiz - obnizenie; // Przy obnizeniu prestizu o 20, jesli mamy tylko 10 prestizu, to spadamy do 40 i tracimy poziom prestizu
+            prestiz = 50 + prestiz - zmiana; // Przy obnizeniu prestizu o 20, jesli mamy tylko 10 prestizu, to spadamy do 40 i tracimy poziom prestizu
             poziom_prestizu--;
             cout << "!!! [UWAGA] Poziom prestizu spada na " << poziom_prestizu << " !!!" << endl;
         }
         else
         {
-            prestiz -= obnizenie;
+            prestiz -= zmiana;
+        }
         }
     }
 
@@ -80,7 +88,7 @@ public:
                 budzet -= koszt_szkolenia;
                 pracownicy[numer_pracownika]->awansuj();
                 cout << "Wydano " << koszt_szkolenia << " zl na szkolenie." << endl;
-                prestiz += 20;
+                zmien_prestiz(20);
             }
             else
             {
@@ -193,7 +201,7 @@ public:
                 }
             }
             if (aktywni_pracownicy == 0)
-                obniz_prestiz(5);
+                zmien_prestiz(-5);
             zdarzenie_losowe();
             if (poziom_czystosci < 0) poziom_czystosci = 0;
             if (poziom_czystosci > 100) poziom_czystosci = 100;
@@ -429,7 +437,7 @@ public:
             cout << "!!! [ZDARZENIE] Kontrola SANEPIDU !!!" << endl;
             if (poziom_czystosci < 50) {
                 cout << " -> Syf w kuchni! Mandat 300 zl i tracisz prestiz [-20]." << endl;
-                budzet -= 300; dzienny_bilans_losowy -= 300; obniz_prestiz(20);
+                budzet -= 300; dzienny_bilans_losowy -= 300; zmien_prestiz(-20);
             } else {
                 cout << " -> Czysto! Sanepid gratuluje. Prestiz w gore [+10]!" << endl; prestiz += 10;
             }
@@ -451,7 +459,7 @@ public:
             if (poziom_czystosci > 80 && !gotowe_zestawy.empty()) {
                 cout << " -> Recenzja 5 gwiazdek! [+40 do prestizu]" << endl; prestiz += 40;
             } else {
-                cout << " -> Fatalna recenzja. [-30 do prestizu]" << endl; obniz_prestiz(30);
+                cout << " -> Fatalna recenzja. [-30 do prestizu]" << endl; zmien_prestiz(-30);
             }
         }
         else if (los >= 10 && los <= 11) {
@@ -488,7 +496,7 @@ public:
         }
         else if (los >= 26 && los <= 27) {
             cout << "!!! [ZDARZENIE] Zapalil sie kosz na smieci! [-60 zl gasnica, -10 prestizu] !!!" << endl;
-            budzet -= 60; dzienny_bilans_losowy -= 60; obniz_prestiz(10);
+            budzet -= 60; dzienny_bilans_losowy -= 60; zmien_prestiz(-10);
         }
         else if (los >= 28 && los <= 29) {
             cout << "!!! [ZDARZENIE] Nagle zamowienie cateringowe! [+350 zl do budzetu] !!!" << endl;
@@ -524,7 +532,7 @@ public:
         }
         else if (los >= 44 && los <= 45) {
             cout << "!!! [ZDARZENIE] Awantura klientow na sali! [-20 prestiz, -20 czystosc] !!!" << endl;
-            obniz_prestiz(20); poziom_czystosci -= 20;
+            zmien_prestiz(-20); poziom_czystosci -= 20;
         }
         else if (los >= 46 && los <= 47) {
             cout << "!!! [ZDARZENIE] Wizyta lokalnego Burmistrza! [+30 prestiz] !!!" << endl;
@@ -540,7 +548,7 @@ public:
         }
         else if (los >= 52 && los <= 53) {
             cout << "!!! [ZDARZENIE] Zepsuta klimatyzacja (goraco!) [-150 zl naprawa, -10 prestiz] !!!" << endl;
-            budzet -= 150; dzienny_bilans_losowy -= 150; obniz_prestiz(10);
+            budzet -= 150; dzienny_bilans_losowy -= 150; zmien_prestiz(-10);
         }
         else if (los >= 54 && los <= 55) {
             cout << "!!! [ZDARZENIE] Wspaniala pogoda - ogródek pelen ludzi! [+180 zl do budzetu] !!!" << endl;
